@@ -1,0 +1,30 @@
+version: "3.3"
+volumes:
+  db-data:
+services:
+  wordpress:
+    image: wordpress:latest
+    volumes:
+      - "$PWD:/var/www/html"
+      - "$PWD/.docker/backup:/tmp/backup"
+      - "$PWD/.docker/log:/tmp/log"
+    ports:
+      - ${WORDPRESS_WEB_PORT:-8000}:80
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: "db:3306"
+
+  db:
+    build:
+      context: .
+      dockerfile: ./infra/docker/mysql/Dockerfile
+    ports:
+      - ${DB_PORT:-3306}:3306
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=${DB_NAME:-vtubers}
+      - MYSQL_USER=${DB_USER:-chanmike}
+      - MYSQL_PASSWORD=${DB_PASS:-Tom10jery!?}
+      - MYSQL_ROOT_PASSWORD=${DB_PASS:-Tom10jery!?}
